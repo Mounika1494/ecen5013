@@ -95,7 +95,9 @@ uint8_t size()
 
 status destroy()
 {
+          free(new_buffer->BASE);
           free(new_buffer);
+          new_buffer = 0;
           return Success;
 }
 
