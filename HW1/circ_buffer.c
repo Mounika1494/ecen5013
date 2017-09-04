@@ -15,108 +15,120 @@ typedef struct {
 	uint8_t  SIZE;
 	uint16_t NO_OF_ITEMS;
 	      }Buffer;
-Buffer *ptr;
-Buffer mybuffer;
-Buffer *ptr = &mybuffer;
+Buffer* new_buffer = NULL;
+
 status allocate(Buffer ** d_pointer);
 status destroy();
 bool Is_buffer_full();
 bool Is_buffer_empty();
-status add(uint8_t data);
+status add(void *data);
 status remove_item();
 void dump();
 uint8_t size();
 
 status allocate(Buffer ** d_pointer)
 {
-	if(d_pointer == NULL)
-	{
-	printf("error");
- 	return error;
-	}
-        (*d_pointer)->SIZE = 50;
+        Buffer* mybuffer =  (Buffer*)malloc(sizeof(Buffer));
+        mybuffer->SIZE = 5;
 	 char *memory;
-	memory = (char*)malloc(sizeof(char)*((*d_pointer)->SIZE));
+	memory = (char*)malloc(sizeof(char)*(mybuffer->SIZE));
 	if(memory == NULL)
 	{
 	printf("fail");	
         return Fail;
 	}
-	(*d_pointer)->BASE = memory;
-	(*d_pointer)->HEAD = memory;
-	(*d_pointer)->TAIL = memory;
-        printf("success");
-        printf("Circular Buffer Base is at %d",(*d_pointer)->BASE);
-        printf("Circular Budder Head is ar %d",(*d_pointer)->HEAD);
-        printf("Circular Buffer Tail is at %d",(*d_pointer)->TAIL);
+	mybuffer->BASE = memory;
+	mybuffer->HEAD = memory;
+	mybuffer->TAIL = memory;
+        printf("Head of buffer is at %d\n",mybuffer->HEAD);
+        printf("Tail of buffer is at %d\n",mybuffer->TAIL);
+        (*d_pointer) = mybuffer;
 	return Success;
 }
 
 bool Is_buffer_full()
 {	
-     if(ptr->HEAD==(ptr->BASE + (ptr->SIZE)*(sizeof(uint8_t))))
+     if(new_buffer->HEAD==(new_buffer->BASE + (new_buffer->SIZE)*(sizeof(uint8_t))))
 	{
-        ptr->HEAD=ptr->BASE;
+        new_buffer->HEAD=new_buffer->BASE;
 	return true;
 	}
 	else
 	return false;	
 }
-/*bool Is_buffer_empty()
+bool Is_buffer_empty()
 {
-	if((ptr->HEAD)==(ptr->TAIL))
+	if((new_buffer->HEAD)==(new_buffer->TAIL))
 	return true;
 	else
 	return false;	
-}*/
-status add(uint8_t data)
-{
-printf("data is %d", data);
-if(Is_buffer_full())
-{
-return error;
 }
-*(ptr->HEAD++) = data;
- ptr->NO_OF_ITEMS=ptr->NO_OF_ITEMS+1;
- printf("no of items is %d",ptr->NO_OF_ITEMS);
-return Success;
+status add(void *data)
+{
+        if(Is_buffer_full())
+        {
+        printf("Buffer is full looping back\n");
+        //return error;
+        }
+        printf("item added at address %d index  %d has %d\n",(new_buffer->HEAD),new_buffer->NO_OF_ITEMS,*(int*)data);
+        *(new_buffer->HEAD++) = *(int*)data;
+        new_buffer->NO_OF_ITEMS=new_buffer->NO_OF_ITEMS+1;
+        if(new_buffer->NO_OF_ITEMS > new_buffer->SIZE)
+        new_buffer->NO_OF_ITEMS=new_buffer->SIZE;
+        return Success;
 }
 status remove_item()
 {
-/*
-if(Is_buffer_empty())
-{
-return error;
-}*/
-ptr->TAIL++;
-(ptr->NO_OF_ITEMS)--;
+         if(Is_buffer_empty())
+         {
+         printf("Buffer Empty\n");
+         return error;
+         }
+         printf("item is removed at address %d\n",new_buffer->TAIL);
+         new_buffer->TAIL++;
+         new_buffer->NO_OF_ITEMS--;
 }
 uint8_t size()
 {
-return ptr->NO_OF_ITEMS;
+         return new_buffer->NO_OF_ITEMS;
 }
 
 status destroy()
 {
-        free(ptr);
-	return Success;
+          free(new_buffer);
+          return Success;
 }
 
+void dump()
+{
+for(int i=0;i<(new_buffer->NO_OF_ITEMS);i++)
+{
+printf("buffer at address %d index  %d has %d\n",(new_buffer->TAIL),i,*(new_buffer->TAIL));
+new_buffer->TAIL++;
+if(new_buffer->TAIL == (new_buffer->BASE + (((new_buffer->SIZE))*(sizeof(uint8_t)))))
+new_buffer->TAIL=new_buffer->BASE;
+}
+}
 
 void main()
-{       printf("main");
-        
-	allocate(&ptr);
-        add(5);
-        uint8_t s = size();
-        printf("size is %d",s);
-        add(6);
-        uint8_t s1 = size();
-        printf("size is %d",s);
-        add(7);
-        uint8_t s2 = size();
-        printf("size is %d",s);
-        //destroy();
-        //printf("size after free the memory is %d",ptr->SIZE);
+{        
+	allocate(&new_buffer);
+        uint8_t item;
+        item =5;
+        add(&item);
+        item =6;
+        add(&item);
+        item=7;
+        add(&item);
+        item=8;
+        add(&item);
+        item=9;
+        add(&item);
+        item=10;
+        add(&item);
+        dump();
+        remove_item();
+        dump();
+        destroy();
 }
 
