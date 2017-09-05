@@ -95,21 +95,21 @@ uint8_t size()
 
 status destroy()
 {
-          free(new_buffer->BASE);
-          free(new_buffer);
-          new_buffer = 0;
-          return Success;
+         free(new_buffer->BASE);
+         free(new_buffer);
+         new_buffer = 0;
+         return Success;
 }
 
 void dump()
 {
-for(int i=0;i<(new_buffer->NO_OF_ITEMS);i++)
-{
-printf("buffer at address %d index  %d has %d\n",(new_buffer->TAIL),i,*(new_buffer->TAIL));
-new_buffer->TAIL++;
-if(new_buffer->TAIL == (new_buffer->BASE + (((new_buffer->SIZE))*(sizeof(uint8_t)))))
-new_buffer->TAIL=new_buffer->BASE;
-}
+         for(int i=0;i<(new_buffer->NO_OF_ITEMS);i++)
+         {
+         printf("buffer at address %d index  %d has %d\n",(new_buffer->TAIL),i,*(new_buffer->TAIL));
+         new_buffer->TAIL++;
+         if(new_buffer->TAIL == (new_buffer->BASE + (((new_buffer->SIZE))*(sizeof(uint8_t)))))
+         new_buffer->TAIL=new_buffer->BASE;
+         }
 }
 
 void main()
