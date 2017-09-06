@@ -42,9 +42,18 @@ for(int i=1;i<(index-1);i++)
 {
 traverse = traverse->next;
 }
+if(index==1)
+{
+new_node->previous=NULL;
+new_node->next = traverse;
+*head=new_node;
+}
+else
+{
 new_node->next = traverse->next;
 traverse->next = new_node;
 new_node->previous = traverse;
+}
 if(new_node->next!=NULL)
 {
 new_node->next->previous=new_node;
@@ -69,6 +78,8 @@ add_node(&head,&data,3);
 printf("head is at address %d\n",head);
 data=50;
 add_node(&head,&data,1);
+printf("head is at address %d\n",head);
+add_node(&head,&data,2);
 }
 
 
