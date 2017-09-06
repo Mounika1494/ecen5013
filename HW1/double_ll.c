@@ -18,49 +18,46 @@ struct node *next;
 struct node* head=NULL;
 status destroy();
 status add_node(struct node **head,void *data,uint16_t index);
-status remove_node(struct node **base,uint16_t index);
+status remove_node(struct node **base,void *data,uint16_t index);
 uint8_t* search(void *data);
 uint16_t size();
 void print();
 
 void print()
 {
-struct node* current = (struct node*) malloc(sizeof(struct node));
-current=head;
-while(current!=NULL)
-{
-printf("%d\n",*(int*)(current->data));
-current=current->next;
-}
+	struct node* current = (struct node*) malloc(sizeof(struct node));
+	current=head;
+	while(current!=NULL)
+	{
+	printf("%d\n",*(int*)(current->data));
+	current=current->next;
+	}
 }
 
 uint16_t size()
 {
-uint16_t dll_size=0;
-struct node* current = (struct node*) malloc(sizeof(struct node));
-current=head;
-while(current!=NULL)
-{
-dll_size++;
-current=current->next;
-}
-return dll_size;
+	uint16_t dll_size=0;
+	struct node* current = (struct node*) malloc(sizeof(struct node));
+	current=head;
+	while(current!=NULL)
+	{
+	dll_size++;
+	current=current->next;
+	}
+	return dll_size;
 }
 
 status add_node(struct node **head, void *item,uint16_t index)
 {
 	struct node* new_node = (struct node*) malloc(sizeof(struct node));
-	printf("new node address is at %d", new_node);
 	struct node *traverse = *head;
 	new_node->data =  malloc(sizeof(int));
 	*(int*)(new_node -> data) = *(int*)item;
 	new_node -> next = NULL;
 	if (*head ==NULL)
 	{
-	printf("linked list is empty\n");
 	*head = new_node;
 	new_node->previous = NULL;
-	printf("data %d is added at index %d whose next is %d and previous is at %d\n",index,*(int*)	   (new_node->data),new_node->next,new_node->previous);  
 	}
 	else
 	{
@@ -83,10 +80,7 @@ status add_node(struct node **head, void *item,uint16_t index)
 	if(new_node->next!=NULL)
 	{
 	new_node->next->previous=new_node;
-	printf("next node is at address %d and next to %d and previous to %d\n",new_node->next,new_node->next->next,new_node->next->previous);
 	}
-	printf("previous node is at address %d and next to %d and previous to %d\n",traverse,traverse->next,traverse->previous);
-	printf("data %d is added at index %d whose next is %d and previous is at %d\n",index,*(int*)(new_node->data),new_node->next,new_node->previous);
 	}
 	return Success;
 }
@@ -102,11 +96,8 @@ uint8_t* search(void *item)
 	{
 	 if(*(int*)(traverse->data) == *(int*)item)
           {
-           printf("head is at address %d\n and contains %d\n", traverse,*(int*)(traverse->data));
 	   return index;
 	  }
-          printf("outside if\n");
-          printf("head is at address %d\n and contains %d\n", traverse,*(int*)(traverse->data));
           traverse=traverse->next;
           (*index)++;
         }
@@ -116,13 +107,40 @@ uint8_t* search(void *item)
 
 status destroy()
 {
-while(head!=NULL)
+	while(head!=NULL)
+	{
+	free(head);
+	head=head->next;
+	}
+	return Success;
+}
+
+status remove_node(struct node **head,void *data,uint16_t index)
 {
-free(head);
-head=head->next;
+        struct node *traverse = *head;
+	for(int i=0;i<(index-1);i++)
+	{
+	traverse = traverse->next;
+	}
+        *(int*)data = *(int*)(traverse->data);
+        if(traverse->next != NULL && traverse->previous != NULL)
+        {
+        traverse->previous->next = traverse->next;
+        traverse->next->previous = traverse->previous;
+        }
+        else if(traverse->next == NULL)
+        {
+        traverse->previous->next = NULL;
+        }
+        else if(traverse->previous == NULL)
+        {
+        *head = traverse->next;
+        traverse->next->previous = NULL;
+        }
+        free(traverse);
+
 }
-return Success;
-}
+
 void main()
 {
 uint32_t data1 = 20;
@@ -146,12 +164,17 @@ printf("head is at address %d\n",head);
 uint32_t data5=60;
 add_node(&head,&data5,2);
 print();
+printf("size of linked list is %d\n",size());
 uint32_t data=30;
 uint8_t* index;
 index=search(&data);
 printf("data %d is found at index %d\n",data,*index);
+uint8_t *removed_data = malloc(sizeof(uint8_t));
+remove_node(&head,removed_data,1);
+printf("size of linked list is %d\n",size());
+printf("data removed is %d\n",*removed_data);
+print();
 destroy();
-printf("head is has data %d\n",head);
 }
 
 
