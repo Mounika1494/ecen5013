@@ -24,9 +24,9 @@ typedef enum
 
 typedef struct
 {
-	uint8_t* HEAD;
-	uint8_t* TAIL;
-	uint8_t* BASE;
+	uint32_t* HEAD;
+	uint32_t* TAIL;
+	uint32_t* BASE;
 	uint8_t  SIZE;
 	uint16_t NO_OF_ITEMS
 }Buffer;
@@ -45,12 +45,12 @@ uint8_t size();
 /*allocateand initialise the buffer and structure*/
 Status allocate(Buffer ** d_pointer)
 {
-        char *memory;
+        uint32_t *memory = NULL;
         Buffer* mybuffer =  (Buffer*)malloc(sizeof(Buffer));
         printf("Enter the size of circular buffer\n");
         scanf("%d",&(mybuffer->SIZE));
         printf("buffer size is %d\n",mybuffer->SIZE);
-	memory = (char*)malloc(sizeof(char)*(mybuffer->SIZE));
+	memory = (uint32_t*)malloc(sizeof(uint32_t)*(mybuffer->SIZE));
 	if(memory == NULL)
 	{
 	printf("fail");	
@@ -61,6 +61,7 @@ Status allocate(Buffer ** d_pointer)
 	mybuffer->TAIL = memory;
         printf("Head of buffer is at %d\n",mybuffer->HEAD);
         printf("Tail of buffer is at %d\n",mybuffer->TAIL);
+        printf("Tail of buffer is at %d\n",mybuffer->BASE);
         (*d_pointer) = mybuffer;
 	return Success;
 }
@@ -68,7 +69,7 @@ Status allocate(Buffer ** d_pointer)
 /*if head has reached the end then loop back*/
 bool Is_buffer_full()
 {	
-     if(new_buffer->HEAD==(new_buffer->BASE + (new_buffer->SIZE)*(sizeof(uint8_t))))
+     if(new_buffer->HEAD==((uint32_t)new_buffer->BASE + ((new_buffer->SIZE)*(sizeof(uint32_t)))))
 	{
         new_buffer->HEAD=new_buffer->BASE;
 	return true;
@@ -93,8 +94,8 @@ Status add(void *data)
         {
         printf("Buffer is full looping back\n");
         }
-        printf("item added at address %d index  %d has %d\n",(new_buffer->HEAD),new_buffer->NO_OF_ITEMS,*(int*)data);
         *(new_buffer->HEAD++) = *(int*)data;
+        printf("item added at address %d index  %d has %d\n",(new_buffer->HEAD),new_buffer->NO_OF_ITEMS,*(uint32_t*)data);
         new_buffer->NO_OF_ITEMS=new_buffer->NO_OF_ITEMS+1;
         if(new_buffer->NO_OF_ITEMS > new_buffer->SIZE)
         new_buffer->NO_OF_ITEMS=new_buffer->SIZE;
@@ -107,7 +108,6 @@ Status remove_item()
          if(Is_buffer_empty())
          {
          printf("Buffer Empty\n");
-         //return Error;
          }
          printf("item is removed at address %d\n",new_buffer->TAIL);
          new_buffer->TAIL++;
@@ -133,8 +133,7 @@ Status destroy()
 /*prints the data in the buffer in a readable format*/
 void dump()
 {
-         uint8_t *traverse;
-         traverse = malloc(sizeof(uint8_t));
+         uint32_t *traverse = (uint32_t*)malloc(sizeof(uint32_t));
          traverse = new_buffer->TAIL;
          if(traverse==NULL)
          {
@@ -144,15 +143,13 @@ void dump()
          {
          printf("buffer at address %d index  %d has %d\n",(traverse),i,*(traverse));
          traverse++;
-         if(traverse == (new_buffer->BASE + (((new_buffer->SIZE))*(sizeof(uint8_t)))))
-         traverse=new_buffer->BASE;
          }
 }
 
 void main()
 {        
 	allocate(&new_buffer);
-        uint8_t item;
+        uint32_t item;
         item =5;
         add(&item);
         item =6;
