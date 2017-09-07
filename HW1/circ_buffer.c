@@ -45,12 +45,12 @@ uint8_t size();
 /*allocateand initialise the buffer and structure*/
 Status allocate(Buffer ** d_pointer)
 {
-        uint32_t *memory = NULL;
+        void *memory = NULL;
         Buffer* mybuffer =  (Buffer*)malloc(sizeof(Buffer));
         printf("Enter the size of circular buffer\n");
         scanf("%d",&(mybuffer->SIZE));
         printf("buffer size is %d\n",mybuffer->SIZE);
-	memory = (uint32_t*)malloc(sizeof(uint32_t)*(mybuffer->SIZE));
+	memory = (void*)malloc(sizeof(void*)*(mybuffer->SIZE));
 	if(memory == NULL)
 	{
 	printf("fail");	
@@ -69,7 +69,7 @@ Status allocate(Buffer ** d_pointer)
 /*if head has reached the end then loop back*/
 bool Is_buffer_full()
 {	
-     if(new_buffer->HEAD==((uint32_t)new_buffer->BASE + ((new_buffer->SIZE)*(sizeof(uint32_t)))))
+     if(new_buffer->HEAD==((uint32_t)new_buffer->BASE + ((new_buffer->SIZE)*(sizeof(void*)))))
 	{
         new_buffer->HEAD=new_buffer->BASE;
 	return true;
@@ -94,7 +94,8 @@ Status add(void *data)
         {
         printf("Buffer is full looping back\n");
         }
-        *(new_buffer->HEAD++) = *(int*)data;
+        *(new_buffer->HEAD) = *(uint32_t*)data;
+         new_buffer->HEAD = (uint32_t)new_buffer->HEAD + sizeof(void*);
         printf("item added at address %d index  %d has %d\n",(new_buffer->HEAD),new_buffer->NO_OF_ITEMS,*(uint32_t*)data);
         new_buffer->NO_OF_ITEMS=new_buffer->NO_OF_ITEMS+1;
         if(new_buffer->NO_OF_ITEMS > new_buffer->SIZE)
@@ -110,7 +111,7 @@ Status remove_item()
          printf("Buffer Empty\n");
          }
          printf("item is removed at address %d\n",new_buffer->TAIL);
-         new_buffer->TAIL++;
+         new_buffer->TAIL = (uint32_t)new_buffer->TAIL+sizeof(void*);
          new_buffer->NO_OF_ITEMS--;
          return Success;
 }
@@ -133,16 +134,16 @@ Status destroy()
 /*prints the data in the buffer in a readable format*/
 void dump()
 {
-         uint32_t *traverse = (uint32_t*)malloc(sizeof(uint32_t));
-         traverse = new_buffer->TAIL;
+         void *traverse = NULL;
+         traverse = (void*)new_buffer->TAIL;
          if(traverse==NULL)
          {
          printf("Error in the address\n");
          }
          for(int i=0;i<(new_buffer->NO_OF_ITEMS);i++)
          {
-         printf("buffer at address %d index  %d has %d\n",(traverse),i,*(traverse));
-         traverse++;
+         printf("buffer at address %d index  %d has %d\n",(traverse),i,*(uint32_t*)(traverse));
+         traverse = traverse + sizeof(void*);
          }
 }
 
