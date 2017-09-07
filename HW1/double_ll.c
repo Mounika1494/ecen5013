@@ -1,12 +1,23 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+/**************************************************************************************
+*@Filename:double_ll.c
+*
+*@Description: Implementation of different functions like adding or deleting node,
+search data in the list,size of the double linked list 
+*
+*@Author:Mounika Reddy Edula
+*@Date:09/07/2017
+*@compiler:gcc
+*@debugger:gdb
+**************************************************************************************/
 typedef enum  
 {
 	Success =0,
 	Fail = 1,
 	error
-}status;
+}Status;
 
 struct node
 {
@@ -16,13 +27,14 @@ struct node *next;
 };
 
 struct node* head=NULL;
-status destroy();
-status add_node(struct node **head,void *data,uint16_t index);
-status remove_node(struct node **base,void *data,uint16_t index);
+Status destroy();
+Status add_node(struct node **head,void *data,uint16_t index);
+Status remove_node(struct node **base,void *data,uint16_t index);
 uint8_t* search(void *data);
 uint16_t size();
 void print();
 
+/**dumps data present in linked list****/
 void print()
 {
 	struct node* current = (struct node*) malloc(sizeof(struct node));
@@ -32,8 +44,10 @@ void print()
 	printf("%d\n",*(int*)(current->data));
 	current=current->next;
 	}
+        free(current);
 }
 
+/******returns the size of linked list*******/
 uint16_t size()
 {
 	uint16_t dll_size=0;
@@ -44,16 +58,27 @@ uint16_t size()
 	dll_size++;
 	current=current->next;
 	}
+        free(current);
 	return dll_size;
 }
 
-status add_node(struct node **head, void *item,uint16_t index)
+/*returns Fail if any null pointer is accessed or adding a node at index greater than size of linked list*/
+Status add_node(struct node **head, void *item,uint16_t index)
 {
 	struct node* new_node = (struct node*) malloc(sizeof(struct node));
 	struct node *traverse = *head;
 	new_node->data =  malloc(sizeof(int));
 	*(int*)(new_node -> data) = *(int*)item;
 	new_node -> next = NULL;
+        printf("Size is %d\n",size());
+        if(index>(size()+1))
+        {
+         return Fail;
+        }
+        if(item == NULL)
+        {
+        return Fail;
+        }
 	if (*head ==NULL)
 	{
 	*head = new_node;
@@ -84,13 +109,13 @@ status add_node(struct node **head, void *item,uint16_t index)
 	}
 	return Success;
 }
+
+/*** seraches for an item in the linked list and returns the index pointer***/
 uint8_t* search(void *item)
 {
-	uint8_t *index;
-        uint8_t temp;
-        index=&temp;
-        *index=1;
         struct node* traverse = (struct node*) malloc(sizeof(struct node));
+	uint8_t *index  = malloc(sizeof(uint8_t));
+        *index=1;
         traverse=head;
 	while(traverse!=NULL)
 	{
@@ -102,10 +127,12 @@ uint8_t* search(void *item)
           (*index)++;
         }
      *index =0;
+     free(traverse);
      return index;	
 }
 
-status destroy()
+/*** destroys all nodes in the linked list****/
+Status destroy()
 {
 	while(head!=NULL)
 	{
@@ -115,9 +142,18 @@ status destroy()
 	return Success;
 }
 
-status remove_node(struct node **head,void *data,uint16_t index)
+/*returns fail if any null pointer is accessed or index > size of linked list*/
+Status remove_node(struct node **head,void *data,uint16_t index)
 {
         struct node *traverse = *head;
+        if(index>(size()))
+        {
+         return Fail;
+        }
+        if(*head == NULL)
+        {
+        return Fail;
+        }
 	for(int i=0;i<(index-1);i++)
 	{
 	traverse = traverse->next;
@@ -143,6 +179,8 @@ status remove_node(struct node **head,void *data,uint16_t index)
 
 void main()
 {
+uint8_t *removed_data1 = malloc(sizeof(uint8_t));
+remove_node(&head,removed_data1,1);
 uint32_t data1 = 20;
 add_node(&head,&data1,1);
 print();
@@ -176,5 +214,3 @@ printf("data removed is %d\n",*removed_data);
 print();
 destroy();
 }
-
-

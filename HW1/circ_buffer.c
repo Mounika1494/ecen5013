@@ -3,6 +3,18 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+/**************************************************************************************
+*@Filename:circ_buffer.c
+*
+*@Description: Implementation of different functions like allocation,
+destroy,is_buffer_full,is_buffer_empty,add,remove data to buffer,
+dump - print the elements,size - number of items 
+*
+*@Author:Mounika Reddy Edula
+*@Date:09/07/2017
+*@compiler:gcc
+*@debugger:gdb
+**************************************************************************************/
 typedef enum  
 {
 	Success =0,
@@ -30,6 +42,7 @@ Status remove_item();
 void dump();
 uint8_t size();
 
+/*allocateand initialise the buffer and structure*/
 Status allocate(Buffer ** d_pointer)
 {
         char *memory;
@@ -52,6 +65,7 @@ Status allocate(Buffer ** d_pointer)
 	return Success;
 }
 
+/*if head has reached the end then loop back*/
 bool Is_buffer_full()
 {	
      if(new_buffer->HEAD==(new_buffer->BASE + (new_buffer->SIZE)*(sizeof(uint8_t))))
@@ -62,6 +76,8 @@ bool Is_buffer_full()
 	else
 	return false;	
 }
+
+/*if head and tail are pointed to the same address then buffer is empty*/
 bool Is_buffer_empty()
 {
 	if((new_buffer->HEAD)==(new_buffer->TAIL))
@@ -69,6 +85,8 @@ bool Is_buffer_empty()
 	else
 	return false;	
 }
+
+/*add the data pointed by the pointer */
 Status add(void *data)
 {
         if(Is_buffer_full())
@@ -82,6 +100,8 @@ Status add(void *data)
         new_buffer->NO_OF_ITEMS=new_buffer->SIZE;
         return Success;
 }
+
+/*removes the item where tail is pointed to*/
 Status remove_item()
 {
          if(Is_buffer_empty())
@@ -94,11 +114,14 @@ Status remove_item()
          new_buffer->NO_OF_ITEMS--;
          return Success;
 }
+
+/*returns the variable in the buffer structure*/
 uint8_t size()
 {
          return new_buffer->NO_OF_ITEMS;
 }
 
+/*destroys the circular buffer*/
 Status destroy()
 {
          free(new_buffer->BASE);
@@ -107,6 +130,7 @@ Status destroy()
          return Success;
 }
 
+/*prints the data in the buffer in a readable format*/
 void dump()
 {
          uint8_t *traverse;
