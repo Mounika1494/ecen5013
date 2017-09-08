@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "double_ll.h"
 /**************************************************************************************
 *@Filename:double_ll.c
 *
@@ -12,27 +13,8 @@ search data in the list,size of the double linked list
 *@compiler:gcc
 *@debugger:gdb
 **************************************************************************************/
-typedef enum  
-{
-	Success =0,
-	Fail = 1,
-	error
-}Status;
-
-struct node
-{
-void *data;
-struct node *previous;
-struct node *next;
-};
 
 struct node* head=NULL;
-Status destroy();
-Status add_node(struct node **head,void *data,uint16_t index);
-Status remove_node(struct node **base,void *data,uint16_t index);
-uint8_t* search(void *data);
-uint16_t size();
-void print();
 
 /**dumps data present in linked list****/
 void print()
@@ -41,7 +23,6 @@ void print()
 	current=head;
 	while(current!=NULL)
 	{
-	printf("%d\n",*(int*)(current->data));
 	current=current->next;
 	}
         free(current);
@@ -175,42 +156,35 @@ Status remove_node(struct node **head,void *data,uint16_t index)
         }
         free(traverse);
 
+        return Success;
 }
 
-void main()
+int main()
 {
 uint8_t *removed_data1 = malloc(sizeof(uint8_t));
 remove_node(&head,removed_data1,1);
 uint32_t data1 = 20;
 add_node(&head,&data1,1);
 print();
-printf("size of linked list is %d\n",size());
 uint32_t data2=30;
-printf("head is at address %d\n",head);
 add_node(&head,&data2,2);
 print();
-printf("head is at address %d\n",head);
 uint32_t data3=40;
 add_node(&head,&data3,3);
 print();
-printf("head is at address %d\n",head);
 uint32_t data4=50;
 add_node(&head,&data4,1);
 print();
-printf("size of linked list is %d\n",size());
-printf("head is at address %d\n",head);
 uint32_t data5=60;
 add_node(&head,&data5,2);
 print();
-printf("size of linked list is %d\n",size());
 uint32_t data=30;
 uint8_t* index;
 index=search(&data);
-printf("data %d is found at index %d\n",data,*index);
+printf("found at %d\n",*index);
 uint8_t *removed_data = malloc(sizeof(uint8_t));
 remove_node(&head,removed_data,1);
-printf("size of linked list is %d\n",size());
-printf("data removed is %d\n",*removed_data);
 print();
 destroy();
+return 0;
 }

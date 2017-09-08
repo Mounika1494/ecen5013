@@ -35,11 +35,11 @@ typedef enum
 /* struct for the circular buffer*/
 typedef struct
 {
-	uint8_t* HEAD;
-	uint8_t* TAIL;
-	uint8_t* BASE;
-	uint8_t  SIZE;
-	uint16_t NO_OF_ITEMS
+	void* HEAD;
+	void* TAIL;
+	void* BASE;
+	uint32_t  SIZE;
+	uint32_t NO_OF_ITEMS;
 }Buffer;
 
 bool Is_buffer_full();
@@ -47,7 +47,7 @@ bool Is_buffer_empty();
 Status add(void *data);
 Status remove_item();
 void dump();
-uint8_t size();
+uint16_t size();
 
 /**
 * @brief destroys the circular buffer

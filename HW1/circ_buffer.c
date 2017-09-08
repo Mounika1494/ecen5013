@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-
+#include "circ_buffer.h"
 /**************************************************************************************
 *@Filename:circ_buffer.c
 *
@@ -15,53 +15,23 @@ dump - print the elements,size - number of items
 *@compiler:gcc
 *@debugger:gdb
 **************************************************************************************/
-typedef enum  
-{
-	Success =0,
-	Fail = 1,
-	Error
-}Status;
-
-typedef struct
-{
-	uint32_t* HEAD;
-	uint32_t* TAIL;
-	uint32_t* BASE;
-	uint8_t  SIZE;
-	uint16_t NO_OF_ITEMS
-}Buffer;
 
 Buffer* new_buffer = NULL;
 
-Status allocate(Buffer ** d_pointer);
-Status destroy();
-bool Is_buffer_full();
-bool Is_buffer_empty();
-Status add(void *data);
-Status remove_item();
-void dump();
-uint8_t size();
-
-/*allocateand initialise the buffer and structure*/
+/*allocate and initialise the buffer and structure*/
 Status allocate(Buffer ** d_pointer)
 {
         void *memory = NULL;
         Buffer* mybuffer =  (Buffer*)malloc(sizeof(Buffer));
-        printf("Enter the size of circular buffer\n");
         scanf("%d",&(mybuffer->SIZE));
-        printf("buffer size is %d\n",mybuffer->SIZE);
 	memory = (void*)malloc(sizeof(void*)*(mybuffer->SIZE));
 	if(memory == NULL)
 	{
-	printf("fail");	
         return Fail;
 	}
 	mybuffer->BASE = memory;
 	mybuffer->HEAD = memory;
 	mybuffer->TAIL = memory;
-        printf("Head of buffer is at %d\n",mybuffer->HEAD);
-        printf("Tail of buffer is at %d\n",mybuffer->TAIL);
-        printf("Tail of buffer is at %d\n",mybuffer->BASE);
         (*d_pointer) = mybuffer;
 	return Success;
 }
@@ -69,7 +39,7 @@ Status allocate(Buffer ** d_pointer)
 /*if head has reached the end then loop back*/
 bool Is_buffer_full()
 {	
-     if(new_buffer->HEAD==((uint32_t)new_buffer->BASE + ((new_buffer->SIZE)*(sizeof(void*)))))
+     if(new_buffer->HEAD==(new_buffer->BASE + ((new_buffer->SIZE)*(sizeof(void*)))))
 	{
         new_buffer->HEAD=new_buffer->BASE;
 	return true;
@@ -94,9 +64,9 @@ Status add(void *data)
         {
         printf("Buffer is full looping back\n");
         }
-        *(new_buffer->HEAD) = *(uint32_t*)data;
-         new_buffer->HEAD = (uint32_t)new_buffer->HEAD + sizeof(void*);
-        printf("item added at address %d index  %d has %d\n",(new_buffer->HEAD),new_buffer->NO_OF_ITEMS,*(uint32_t*)data);
+        *(uint32_t*)(new_buffer->HEAD) = *(uint32_t*)data;
+        printf("buffer at address %d has %d\n",(new_buffer->HEAD),*(uint32_t*)(new_buffer->HEAD));
+        new_buffer->HEAD = new_buffer->HEAD + sizeof(void*);
         new_buffer->NO_OF_ITEMS=new_buffer->NO_OF_ITEMS+1;
         if(new_buffer->NO_OF_ITEMS > new_buffer->SIZE)
         new_buffer->NO_OF_ITEMS=new_buffer->SIZE;
@@ -109,15 +79,15 @@ Status remove_item()
          if(Is_buffer_empty())
          {
          printf("Buffer Empty\n");
+         return Fail;
          }
-         printf("item is removed at address %d\n",new_buffer->TAIL);
-         new_buffer->TAIL = (uint32_t)new_buffer->TAIL+sizeof(void*);
+         new_buffer->TAIL = new_buffer->TAIL+sizeof(void*);
          new_buffer->NO_OF_ITEMS--;
          return Success;
 }
 
 /*returns the variable in the buffer structure*/
-uint8_t size()
+uint16_t size()
 {
          return new_buffer->NO_OF_ITEMS;
 }
@@ -147,7 +117,7 @@ void dump()
          }
 }
 
-void main()
+int main()
 {        
 	allocate(&new_buffer);
         uint32_t item;
@@ -167,5 +137,6 @@ void main()
         remove_item();
         dump();
         destroy();
+        return 0;
 }
 
