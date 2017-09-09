@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sudo python /home/mounika/ecen5013/HW1/new_machine.py 
+echo export PATH="$HOME/ecen5013/bin:$PATH" >>~/.profile

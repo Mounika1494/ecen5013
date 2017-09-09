@@ -14,7 +14,7 @@ nocpu=subprocess.Popen(["nproc"],stdout = subprocess.PIPE,stderr = subprocess.PI
 cpu,err = nocpu.communicate()
 cpu = cpu.strip('\n') 
 print "no of cpu cores",cpu
-subprocess.Popen(["make","-j",cpu])
-subprocess.Popen(["make","modules_install","-j",cpu])
-subprocess.Popen(["make","install","-j",cpu])
+subprocess.Popen(["make","-j","4"])
+subprocess.Popen(["make","modules_install","-j","4"])
+subprocess.Popen(["make","install","-j","4"])
 

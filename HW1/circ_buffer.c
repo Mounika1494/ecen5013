@@ -23,6 +23,7 @@ Status allocate(Buffer ** d_pointer)
 {
         void *memory = NULL;
         Buffer* mybuffer =  (Buffer*)malloc(sizeof(Buffer));
+        printf("Enter the size \n");
         scanf("%d",&(mybuffer->SIZE));
 	memory = (void*)malloc(sizeof(void*)*(mybuffer->SIZE));
 	if(memory == NULL)
@@ -65,7 +66,6 @@ Status add(void *data)
         printf("Buffer is full looping back\n");
         }
         *(uint32_t*)(new_buffer->HEAD) = *(uint32_t*)data;
-        printf("buffer at address %d has %d\n",(new_buffer->HEAD),*(uint32_t*)(new_buffer->HEAD));
         new_buffer->HEAD = new_buffer->HEAD + sizeof(void*);
         new_buffer->NO_OF_ITEMS=new_buffer->NO_OF_ITEMS+1;
         if(new_buffer->NO_OF_ITEMS > new_buffer->SIZE)
@@ -112,7 +112,7 @@ void dump()
          }
          for(int i=0;i<(new_buffer->NO_OF_ITEMS);i++)
          {
-         printf("buffer at address %d index  %d has %d\n",(traverse),i,*(uint32_t*)(traverse));
+         printf("buffer at index  %d has %d\n",i,*(uint32_t*)(traverse));
          traverse = traverse + sizeof(void*);
          }
 }
