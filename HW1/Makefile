@@ -1,3 +1,5 @@
+#makefile credits to sam siewert
+ 
 INCLUDE_DIRS = 
 LIB_DIRS = 
 
