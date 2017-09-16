@@ -17,7 +17,6 @@ dump - print the elements,size - number of items
 **************************************************************************************/
 
 Buffer* new_buffer = NULL;
-int buffer_full = 0;
 
 /*allocate and initialise the buffer and structure*/
 Status allocate(Buffer ** d_pointer)
@@ -43,7 +42,6 @@ bool Is_buffer_full()
 {	
      if(new_buffer->HEAD==(new_buffer->BASE + ((new_buffer->SIZE)*(sizeof(void*)))))
 	{
-        new_buffer->HEAD=new_buffer->BASE;
 	return true;
 	}
 	else
@@ -65,15 +63,19 @@ Status add(void *data)
         
         if(Is_buffer_full())
         {
-        buffer_full = 1;
-        printf("Buffer is full looping back\n");
-        }
-        if(buffer_full == 0)
+        if(new_buffer->TAIL==new_buffer->BASE)
         {
-        new_buffer->NO_OF_ITEMS = new_buffer->NO_OF_ITEMS+1;
+        printf("Buffer is full.Should remove an item before adding\n");
+        return Fail;
         }
+        else
+        {
+        new_buffer->HEAD=new_buffer->BASE;
+        }
+        }       
         *(uint32_t*)(new_buffer->HEAD) = *(uint32_t*)data;
         new_buffer->HEAD = new_buffer->HEAD + sizeof(void*);
+        new_buffer->NO_OF_ITEMS = new_buffer->NO_OF_ITEMS+1;
         if(new_buffer->NO_OF_ITEMS > new_buffer->SIZE)
         new_buffer->NO_OF_ITEMS=new_buffer->SIZE;
         return Success;
@@ -120,11 +122,11 @@ void dump()
          {
          printf("buffer at index  %d has %d\n",i,*(uint32_t*)(traverse));
          traverse = traverse + sizeof(void*);
-         /*if(traverse == (new_buffer->BASE + ((new_buffer->SIZE)*sizeof(void*))))
+         if(traverse == (new_buffer->BASE + ((new_buffer->SIZE)*sizeof(void*))))
          {
-         printf("tail looping back\n");
+         //printf("tail looping back\n");
          traverse = (void *)new_buffer->BASE;
-         }*/
+         }
          }
 }
 
@@ -146,6 +148,7 @@ int main()
         add(&item);
         dump();
         remove_item();
+        printf("removed an item\n");
         dump();
         item=11;
         add(&item);
