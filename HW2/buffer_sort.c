@@ -45,7 +45,7 @@ printf("memory not allocated\n");
 for(int i=0;i<size;i++)
 {
  data = rand();
- printf("data added at index %d is %d\n",i,data);
+ //printf("data added at index %d is %d\n",i,data);
  *temp_buffer++ = data;
 }
 
@@ -55,11 +55,15 @@ ret_status = syscall(333,buffer,size,sort_buffer);
 printf("Exited the system call and it returned %d\n",ret_status);
 
 //print the output
+/*
+if(ret_status ==0)
+{
 printf("*******sorted buffer *******\n");
 for(int i=0;i<size;i++)
 {
  printf("data added at index %d is %d\n",i,*sort_buffer++);
 }
+}*/
 }
 
 
