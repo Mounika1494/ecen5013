@@ -1,0 +1,9 @@
+#
+# device driver configuration
+#
+
+config  HELLO
+	tristate "test module"
+	default n
+        help
+	 test program
