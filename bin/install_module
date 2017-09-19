@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sudo python /home/mounika/ecen5013/linux-4.12.10/drivers/mytime/install_modules.py
+
