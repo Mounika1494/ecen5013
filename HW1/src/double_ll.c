@@ -18,25 +18,20 @@ search data in the list,size of the double linked list
 /**dumps data present in linked list****/
 void print(struct node **head)
 {
-        struct node *temp_head = *head;
-	struct node *current = (struct node*) malloc(sizeof(struct node));
-	current=temp_head;
+	struct node *current = *head;
 	while(current!=NULL)
 	{
         printf("current has %d\n",*(uint32_t*)current->data);
 	current=current->next;
 	}
         free(current);
-	free(temp_head);
 }
 
 /******returns the size of linked list*******/
 uint16_t size(struct node **head)
 {
 	uint16_t dll_size=0;
-        struct node *temp_head = *head;
-	struct node *current = (struct node*) malloc(sizeof(struct node));
-	current=temp_head;
+	struct node *current = *head;
         if(current == NULL)
         {
          return 0;
@@ -47,7 +42,6 @@ uint16_t size(struct node **head)
 	current=current->next;
 	}
         free(current);
-	free(temp_head);
 	return dll_size;
 }
 
@@ -102,11 +96,24 @@ Status add_node(struct node **head, void *item,uint16_t index)
 /*** seraches for an item in the linked list and returns the index pointer***/
 uint8_t* search(struct node **head,void *item)
 {
-        struct node *traverse = (struct node*) malloc(sizeof(struct node));
-	struct node *temp_head = *head;
+	struct node *traverse = *head;
 	uint8_t *index  = malloc(sizeof(uint8_t));
         *index=1;
-        traverse=temp_head;
+	if(*head == NULL)
+        {
+        *index = 0;
+	return index;
+        }
+        if(head == NULL)
+        {
+        *index = 0;
+	return index;
+        }
+        if(item == NULL)
+        {
+	*index = 0;
+	return index;
+	}
 	while(traverse!=NULL)
 	{
 	 if(*(int*)(traverse->data) == *(int*)item)
@@ -118,14 +125,17 @@ uint8_t* search(struct node **head,void *item)
         }
      *index =0;
      free(traverse);
-     free(temp_head);
      return index;	
 }
 
 /*** destroys all nodes in the linked list****/
 Status destroy(struct node **head)
 {
-	struct node *tmp = NULL;
+	if(*head == NULL)
+        {
+        return Fail;
+        }
+        struct node *tmp = NULL;
         struct node *temp_head = *head;
 	while(temp_head!=NULL)
 	{
@@ -146,12 +156,17 @@ Status remove_node(struct node **head,void *data,uint16_t index)
         {
         return Fail;
         }
+        if(head == NULL)
+        {
+        return Fail;
+        }
         if(data == NULL)
         {
 	return Fail;
 	}
 	if(index>(size(&traverse)))
         {
+         printf("out of range\n");
          return Fail;
         }
 	for(int i=0;i<(index-1);i++)
@@ -179,30 +194,31 @@ Status remove_node(struct node **head,void *data,uint16_t index)
 
 /*int main()
 {
+struct node *head = NULL;
 uint8_t *removed_data1 = malloc(sizeof(uint8_t));
 remove_node(&head,removed_data1,1);
 uint32_t data1 = 20;
 add_node(&head,&data1,1);
-print();
+print(&head);
 uint32_t data2=30;
 add_node(&head,&data2,2);
-print();
+print(&head);
 uint32_t data3=40;
 add_node(&head,&data3,3);
-print();
+print(&head);
 uint32_t data4=50;
 add_node(&head,&data4,1);
-print();
+print(&head);
 uint32_t data5=60;
 add_node(&head,&data5,2);
-print();
+print(&head);
 uint32_t data=30;
 uint8_t* index;
-index=search(&data);
+index=search(&head,&data);
 printf("found at %d\n",*index);
 uint8_t *removed_data = malloc(sizeof(uint8_t));
 remove_node(&head,removed_data,1);
-print();
-destroy();
+print(&head);
+destroy(&head);
 return 0;
 }*/
