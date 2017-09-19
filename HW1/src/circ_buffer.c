@@ -69,6 +69,10 @@ Status add(Buffer *new_buffer,void *data)
         {
         return error;
         }
+	if(data == NULL)
+        {
+	return error;
+	}
         if(new_buffer->TAIL == NULL || new_buffer->HEAD == NULL || new_buffer->BASE == NULL)
         {
         return error;
@@ -123,7 +127,11 @@ Status remove_item(Buffer *new_buffer)
 /*returns the variable in the buffer structure*/
 uint16_t size(Buffer *new_buffer)
 {
-         return new_buffer->NO_OF_ITEMS;
+	if(new_buffer == NULL)
+	{
+	return error;
+	}
+        return new_buffer->NO_OF_ITEMS;
 }
 
 /*destroys the circular buffer*/
@@ -153,7 +161,7 @@ void dump(Buffer *new_buffer)
          }
          for(int i=0;i<(new_buffer->NO_OF_ITEMS);i++)
          {
-         //printf("buffer at index  %d has %d\n",i,*(uint32_t*)(traverse));
+         printf("buffer at index  %d has %d\n",i,*(uint32_t*)(traverse));
          traverse = traverse + sizeof(void*);
          if(traverse == (new_buffer->BASE + ((new_buffer->SIZE)*sizeof(void*))))
          {

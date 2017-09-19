@@ -7,10 +7,10 @@ CDEFS=
 CFLAGS= -Wall -O0 -g $(INCLUDE_DIRS) $(CDEFS)
 LIBS=
 
-PRODUCT=buffer ll
+PRODUCT=buffer ll 
 
 HFILES= circ_buffer.h double_ll.h
-CFILES= circ_buffer.c double_ll.c
+CFILES= circ_buffer.c double_ll.c test_circbuffer.c
 
 SRCS= ${HFILES} ${CFILES}
 OBJS= ${CFILES:.c=.o}
@@ -26,6 +26,8 @@ buffer:	circ_buffer.o
 
 ll:	double_ll.o
 	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ double_ll.o $(LIBS)
+test:  test_circbuffer.o
+	gcc test_circbuffer.c -lcmocka && ./a.out
 
 depend:
 

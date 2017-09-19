@@ -42,12 +42,6 @@ typedef struct
 	uint32_t NO_OF_ITEMS;
 }Buffer;
 
-bool Is_buffer_full(Buffer * new_buffer);
-bool Is_buffer_empty(Buffer * new_buffer);
-Status add(Buffer * new_buffer,void *data);
-Status remove_item(Buffer *new_buffer);
-void dump(Buffer *new_buffer);
-uint16_t size(Buffer *new_buffer);
 
 /**
 * @brief destroys the circular buffer
