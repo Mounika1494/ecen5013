@@ -1,9 +1,8 @@
-#include <linux/kernel.h>
-#include <linux/init.h>
-#include <linux/sched.h>
-#include <linux/syscalls.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <linux/kernel.h>
+#include <sys/syscall.h>
+#include <unistd.h>
 
 #define sys_sortbuffer 333
 int main()
@@ -40,7 +39,7 @@ printf("Invoking System call sortbuffer\n");
 printf("buffer is at address %d\n",buffer);
 printf("sort_buffer is at address %d\n",sort_buffer);
 printf("size is %d\n",size);
-ret_status = syscall(sys_sortbuffer,buffer,size,sort_buffer);
+ret_status = syscall(333,buffer,size,sort_buffer);
 printf("Exited the system call and it returned %d",ret_status);
 
 printf("*******sorted buffer *******\n");
