@@ -7,7 +7,19 @@
 #include <stdbool.h>
 #include "double_ll.h"
 
+/**********************************************************************
+*@Filename:test_doublell.c
+*
+*@Description: Test the Double linked list with all boundary conditions 
+*like adding a new node at the start,end,middle.removing them in the start
+*end,middle,number of items
+*
+*@Author:Mounika Reddy Edula
+*@Date:09/19/2017
+*@Test Framework:Cmocka
+**********************************************************************/
 
+/*test add node functionality of double linked list*/
 void test_add_node(void **state)
 {
 	struct node* test_head=NULL;
@@ -48,6 +60,7 @@ void test_add_node(void **state)
 	printf("***1.test to add node passed*****\n");
 }
 
+/*test remove node functionality of double linked list*/
 void test_remove_node(void **state)
 {
 	struct node* test_head=NULL;
@@ -94,7 +107,7 @@ void test_remove_node(void **state)
 }
 
 
-
+/*Test the size functionality of double linked list*/
 void test_size(void **state)
 {
 	struct node* test_head=NULL;
@@ -123,6 +136,7 @@ void test_size(void **state)
 	printf("***5. size test passed*****\n");
 }
 
+/*Test the search functionality of double linked list*/
 void test_search(void **state)
 {
 	struct node* test_head=NULL;
@@ -165,6 +179,7 @@ void test_search(void **state)
 	printf("***5. search test passed*****\n");
 }
 
+/*test destroy functionality of double linked list*/
 void test_destroy(void **state)
 {
 	struct node* test_head=NULL;

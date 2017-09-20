@@ -7,7 +7,18 @@
 #include <stdbool.h>
 #include "circ_buffer.h"
 
+/***********************************************************************************
+*@Filename:test_circbuffer.c
+*
+*@Description: Test cases using cmocka to test the boundary conditions for circular buffer
+*pass null pointers, loop back,removing elements,destroy
+*
+*@Author:Mounika Reddy Edula
+*@Date: 09/19/2017
+*@Test Framework: CMocka
+*************************************************************************************/
 
+/*Test the add_item functionality of circular buffer*/
 void test_add_item(void **state)
 {
     Buffer* test_buffer = NULL;
@@ -48,6 +59,7 @@ void test_add_item(void **state)
     printf("***1.add item test passed*****\n");
 }
 
+/*Test the remove_item functionality of circular Buffer*/
 void test_remove_item(void **state)
 {
     Buffer* test_buffer = NULL;
@@ -89,6 +101,7 @@ void test_remove_item(void **state)
     printf("***2. delete item test passed****\n");
 }
 
+/*Test the Is_buffer_full functionality of circular Buffer*/
 void test_is_buffer_full(void **state)
 {
     Buffer* test_buffer = NULL;
@@ -122,6 +135,7 @@ void test_is_buffer_full(void **state)
     printf("***3. Is buffer full test passed*****\n");
 }
 
+/*Test Is_Buffer_empty functionality of Circular Buffer*/
 void test_is_buffer_empty(void **state)
 {
     Buffer* test_buffer = NULL;
@@ -155,6 +169,7 @@ void test_is_buffer_empty(void **state)
     printf("******4. Is buffer empty test passed*****\n");
 }
 
+/*Test the size() functionality of circular Buffer*/
 void test_size(void **state)
 {
     Buffer* test_buffer = NULL;
