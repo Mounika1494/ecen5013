@@ -2,8 +2,8 @@
 # device driver configuration
 #
 
-config  HELLO
-	tristate "test module"
+config  MYTIME
+	tristate "timer module"
 	default n
         help
-	 test program
+	 timer module triggers every 500msec
