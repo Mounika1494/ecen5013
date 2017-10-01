@@ -1,0 +1,9 @@
+#
+# device driver configuration
+#
+
+config  MYTASKINFO
+	tristate "timer module"
+	default n
+        help
+	 timer module triggers every 500msec
