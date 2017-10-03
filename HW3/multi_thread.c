@@ -17,9 +17,29 @@ struct result_struct
    char filename[25];
 }args;
 
+void signal_handler(int signal);
+
+void signal_handler(int signal)
+{
+
+  switch(signal) {
+       case SIGUSR1:
+            fprintf(stdout,"user signal 1 recieved\n");
+            start_process = 1;
+            break;
+       case SIGUSR2:
+            fprintf(stdout,"user signal 2 recieved\n");
+            start_report = 1;
+            break;
+       default:
+            fprintf(stdout,"unknown signal caught\n");
+            return;
+        }
+}
+
 void *process_file(void *args)
 {  
-   //printf("*********thread2 created************\n");
+   fprintf(stdout,"processing thread pid: %d",getpid());
    struct result_struct *result = (struct result_struct *)args;
    char data;
    FILE *input_file;
@@ -31,10 +51,9 @@ void *process_file(void *args)
    return 0;
    while(1)
    {
-   while((data=fgetc(input_file))!=EOF)
-   {
-    fprintf(stdout,"%c",data);
     if(start_process == 1)
+     {
+     while((data=fgetc(input_file))!=EOF)
      {
       if(data != ' '&& data != '\n')
       result->char_count++;
@@ -43,42 +62,30 @@ void *process_file(void *args)
       if(data == '\n')
        result->line_count++;
      }
-  }
-  if(start_process == 1)
-  {
-   fprintf(stdout,"Lines:%d\n",result->line_count);
-   fprintf(stdout,"Words:%d\n",result->word_count);
-   fprintf(stdout,"characters:%d\n",result->char_count);
-  break;
-  }
- }
+     fprintf(stdout,"Lines:%d\n",result->line_count);
+     fprintf(stdout,"Words:%d\n",result->word_count);
+     fprintf(stdout,"characters:%d\n",result->char_count);
+     fclose(input_file);
+     break;
+     }
+    }
   return NULL;
 }
 
-void signal_process(int signal)
-{
-   fprintf(stdout,"user signal 1 recieved\n");
-   start_process = 1;
-}
-
-void signal_report(int signal)
-{
-   fprintf(stdout,"user signal 2 recieved\n");
-   start_report = 1;
-}
 
 void *report_result(void *args)
 {
+   fprintf(stdout,"reporting thread pid is: %d\n",getpid());
    struct result_struct *result = (struct result_struct *)args;
    while(1)
    {
-   //fprintf(stdout,"reporting thread\n");
    if(start_report ==1)
    {
    fprintf(stdout,"***reporting******\n");
    fprintf(stdout,"Lines:%d\n",result->line_count);
    fprintf(stdout,"Words:%d\n",result->word_count);
    fprintf(stdout,"characters:%d\n",result->char_count);
+   break;
    }
    }
    return NULL;
@@ -86,12 +93,12 @@ void *report_result(void *args)
 
 int main()
 {
+   printf("Parent pid is: %d\n",getpid());
    FILE *input_file = NULL;
    pthread_t process_input_thread;
    pthread_t report_result_thread;
    pthread_mutex_t file_mutex;
-   struct sigaction user_sig1;
-   struct sigaction user_sig2;
+   struct sigaction user_sig;
    struct result_struct result;
    char *filename = malloc(25*(sizeof(char)));
    char data;
@@ -105,14 +112,14 @@ int main()
     return 0;
    }
    memcpy(&(result.filename),filename,strlen(filename));
-   user_sig1.sa_handler = signal_process;
-   user_sig2.sa_handler = signal_report;
-   if(sigaction(SIGUSR1, &user_sig1,NULL)< 0)
+   user_sig.sa_handler = signal_handler;
+   sigfillset(&user_sig.sa_mask);
+   if(sigaction(SIGUSR1, &user_sig,NULL)< 0)
    {
     fprintf(stdout,"sigaction can't be linked\n");
     return 1;
    }
-   if(sigaction(SIGUSR2, &user_sig2,NULL)< 0)
+   if(sigaction(SIGUSR2, &user_sig,NULL)< 0)
    {
     fprintf(stdout,"sigaction can't be linked\n");
     return 1;
@@ -124,35 +131,20 @@ int main()
     return 0;
    } 
   
-   /*if(pthread_create(&report_result_thread,NULL,report_result,(void*)&result))
+   if(pthread_create(&report_result_thread,NULL,report_result,(void*)&result))
    {
     fprintf(stdout,"Error creating thread\n");
     return 0;
-   }*/
+   }
    fprintf(stdout,"Enter the data for the file");  
-   while((data = getchar()) != EOF)
+   while(start_process!=1)
    {
+   data =  getchar();
    //pthread_mutex_lock(&file_mutex);
    fputc(data,input_file);
    //pthread_mutex_unlock(&file_mutex); 
    }
    fclose(input_file);
-   fprintf(stdout,"***reporting******\n");
-   fprintf(stdout,"Lines:%d\n",result.line_count);
-   fprintf(stdout,"Words:%d\n",result.word_count);
-   fprintf(stdout,"characters:%d\n",result.char_count);
-   pthread_kill(process_input_thread,SIGUSR1);   
-   if(pthread_join(process_input_thread,NULL))
-   {
-   fprintf(stdout,"Error joining the thread\n");
-   return 0;
-   }
-   fprintf(stdout,"***reporting******\n");
-   fprintf(stdout,"Lines:%d\n",result.line_count);
-   fprintf(stdout,"Words:%d\n",result.word_count);
-   fprintf(stdout,"characters:%d\n",result.char_count);
-   pthread_kill(report_result_thread,SIGUSR2);
-   fprintf(stdout,"signal2 is triggered\n");
+   pthread_join(process_input_thread,NULL);
+   pthread_join(report_result_thread,NULL);
 }
-
-
