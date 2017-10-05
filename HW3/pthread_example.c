@@ -2,6 +2,17 @@
 #include <pthread.h>
 #include <stdlib.h>
 
+/****************************************************************************
+*@Filename:Pthread_example.c
+*
+*@Description: The program helps in tracking the stack used.If the percentage
+*              less than expected then it informs the user about stack utilisation
+*
+*@Author: Mounika Reddy Edula
+*@Date:10/05/2017
+*@Compiler:GCC
+*@Debugger:GDB
+******************************************************************************/
 
 char* value=NULL;
 static volatile int stack_utilised = 0;
@@ -12,6 +23,7 @@ pthread_mutex_t guard_mutex;
 pthread_cond_t stack_condition;
 pthread_mutex_t stack_cond_mutex;
 
+//tracks the stack utilisation of a thread by getting the value from attribute
 void *track_process(void *args) 
 {
      pthread_attr_t attr;
@@ -60,6 +72,7 @@ void *track_process(void *args)
 
 }
 
+//Clean up the resources using a detached thread
 void *cleanup(void *args)
 {   
    pthread_t tid;
@@ -69,7 +82,7 @@ void *cleanup(void *args)
    pthread_exit(NULL);
 }
 
-
+//thread to calculate the percentage of stack usage
 void *track_efficiency(void *args)
 {
     pthread_attr_t attr;
@@ -127,6 +140,7 @@ void *track_efficiency(void *args)
     pthread_exit(NULL);
 }
 
+//When the stack usage is less than expected then inform user
 void *action(void *args)
 {
    

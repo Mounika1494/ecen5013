@@ -5,9 +5,11 @@
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/file.h>
 
 static volatile sig_atomic_t start_report = 0;
 static volatile sig_atomic_t start_process = 0;
+pthread_mutex_t file_mutex;
 
 struct result_struct 
 {
@@ -19,6 +21,19 @@ struct result_struct
 
 void signal_handler(int signal);
 
+/********************************************************
+*@Filename: multi_thread.c
+*
+*@Description: Multi threaded program where threads are triggered
+*by the signals. One thread for processing other for reporting
+*
+*@Author: Mounika Reddy Edula
+*@Date:10/05/2017
+*@Compiler:GCC
+*@Debugger:gdb
+********************************************************/
+
+//Signal_handler for all the signals
 void signal_handler(int signal)
 {
 
@@ -37,9 +52,11 @@ void signal_handler(int signal)
         }
 }
 
+
+//thread for processing the contents from user
 void *process_file(void *args)
 {  
-   fprintf(stdout,"processing thread pid: %d",getpid());
+
    struct result_struct *result = (struct result_struct *)args;
    char data;
    FILE *input_file;
@@ -73,9 +90,10 @@ void *process_file(void *args)
 }
 
 
+//Thread for reporting the result
 void *report_result(void *args)
 {
-   fprintf(stdout,"reporting thread pid is: %d\n",getpid());
+
    struct result_struct *result = (struct result_struct *)args;
    while(1)
    {
@@ -91,13 +109,14 @@ void *report_result(void *args)
    return NULL;
 }
 
+
 int main()
 {
-   printf("Parent pid is: %d\n",getpid());
+   fprintf(stdout,"Parent pid is: %d\n",getpid());
    FILE *input_file = NULL;
    pthread_t process_input_thread;
    pthread_t report_result_thread;
-   pthread_mutex_t file_mutex;
+   int err;
    struct sigaction user_sig;
    struct result_struct result;
    char *filename = malloc(25*(sizeof(char)));
@@ -105,24 +124,33 @@ int main()
    
    fprintf(stdout,"Enter the filename\n");
    scanf("%s",filename);
-   input_file = fopen(filename,"w+");
+   input_file = fopen(filename,"w");
    if(input_file == NULL)
    {
     fprintf(stdout,"file can't be created\n");
     return 0;
    }
+
    memcpy(&(result.filename),filename,strlen(filename));
    user_sig.sa_handler = signal_handler;
    sigfillset(&user_sig.sa_mask);
+  
    if(sigaction(SIGUSR1, &user_sig,NULL)< 0)
    {
     fprintf(stdout,"sigaction can't be linked\n");
     return 1;
    }
+
    if(sigaction(SIGUSR2, &user_sig,NULL)< 0)
    {
     fprintf(stdout,"sigaction can't be linked\n");
     return 1;
+   }
+
+   if(pthread_mutex_init(&file_mutex,NULL) != 0)
+   {
+     fprintf(stdout,"mutex init failed\n");
+     return 1;
    }
 
    if(pthread_create(&process_input_thread,NULL,process_file,(void *)&result))
@@ -137,14 +165,33 @@ int main()
     return 0;
    }
    fprintf(stdout,"Enter the data for the file");  
-   while(start_process!=1)
+   
+   while((data = getchar())!=EOF)
    {
-   data =  getchar();
-   //pthread_mutex_lock(&file_mutex);
+   pthread_mutex_lock(&file_mutex);
    fputc(data,input_file);
-   //pthread_mutex_unlock(&file_mutex); 
+   pthread_mutex_unlock(&file_mutex); 
    }
    fclose(input_file);
-   pthread_join(process_input_thread,NULL);
-   pthread_join(report_result_thread,NULL);
+
+   err = pthread_kill(process_input_thread,SIGUSR1);
+   if(err!=0)
+    fprintf(stdout,"error killing thread %d\n",err);
+
+   err = pthread_join(process_input_thread,NULL);
+   if(err!=0)
+    fprintf(stdout,"error joining thread %d\n",err);
+
+   err = pthread_kill(report_result_thread,SIGUSR2);
+   if(err!=0)
+    fprintf(stdout,"error killing thread %d\n",err);
+
+   err = pthread_join(report_result_thread,NULL);
+   if(err!=0)
+    fprintf(stdout,"error joining the thread %d\n",err);
+
+   err = pthread_mutex_destroy(&file_mutex);
+   if(err!=0)
+    fprintf(stdout,"error destroying the stackmutex %d\n",err);
+
 }
