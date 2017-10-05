@@ -8,45 +8,45 @@
 #include <linux/sched/signal.h>
 
 /**********************************************************************
-*@Filename:mytime.c
+*@Filename:mytaskinfo.c
 *
-*@Description:Implemented a module which is triggered every 500ms
+*@Description:Implemented a module which traverses from current to parent a
+*              and prints the name and no of children
 *
 *@Author:Mounika Reddy Edula
-*@Date:09/19/2017
+*@Date:10/05/2017
 *@compiler:GCC
 *@Debugger:GDB
 *@kernel:4.12.10
 **********************************************************************/
+
 //parameters for modinfo
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Mounika Reddy Edula");
-MODULE_DESCRIPTION("Display all the tasks present");
+MODULE_DESCRIPTION("Traverse from current to parent");
 MODULE_VERSION("0.1");
+
 struct task_struct *task;
 struct list_head *list;
+struct task_struct *my_current;
 static int noofchildren = 0 ;
 
-
-int no_of_children(struct task_struct *present)
-{
-noofchildren = 0; 
-list_for_each(list, &present->children)
-{
-noofchildren++;
-}
-return noofchildren;
-}
-
+//The module enter with __init function
 static int __init tasklist_start(void)
 {
 printk(KERN_INFO "Loading mytask info module ....\n");
-printk(KERN_INFO "All tasks\n");
 
 rcu_read_lock();
-for_each_process(task)
+for(task = current;task!= &init_task;task=task->parent)
 {
-printk("task %s whose pid is %d whose state is %lu no_of_children are %d\n",task->comm,task->pid,task->state,no_of_children(task));
+
+  noofchildren = 1;
+  list_for_each(list,&task->children)
+  {
+  noofchildren++;
+  }
+  printk(KERN_INFO "Process Name is %s PID is %d state is %lu has %d children\n",task->comm,task->pid,task->state,noofchildren);
+
 }
 rcu_read_unlock();
 return 0;
