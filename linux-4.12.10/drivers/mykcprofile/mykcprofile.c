@@ -6,10 +6,10 @@
 #include <linux/kthread.h>
 
 /**********************************************************************
-*@Filename:mytaskinfo.c
+*@Filename:mykcprofile.c
 *
-*@Description:Implemented a module which traverses from current to parent a
-*              and prints the name and no of children
+*@Description:Implemented a module to profile kthreads
+*              
 *
 *@Author:Mounika Reddy Edula
 *@Date:10/05/2017
@@ -23,7 +23,10 @@ MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Mounika Reddy Edula");
 MODULE_DESCRIPTION("Kernel Create Profile");
 
+//thread struct
 struct task_struct *task_kthread;
+
+//kthread function
 int no_work(void *args)
 {
 printk("no work\n");
