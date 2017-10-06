@@ -35,6 +35,7 @@ void *track_process(void *args)
      tid = pthread_self();
      fprintf(stdout,"Track process thread created %lu\n",tid);  
      
+     //mutex_lock example
      if(pthread_attr_init(&attr) == -1)
      {
      fprintf(stdout,"error in attributr init\n");
@@ -45,11 +46,13 @@ void *track_process(void *args)
      if(ret!=0)
      fprintf(stdout,"error locking mutex %d\n",ret);
 
+     //get_attribute example
      ret = pthread_attr_getstacksize(&attr,&stacksize);
      if(ret!=0)
      fprintf(stdout,"error getting attribute stack %d\n",ret);
      stack_utilised = stacksize + stack_utilised;
      
+     //mutex_unlock example
      ret = pthread_mutex_unlock(&stack_mutex);
      if(ret!=0)
      fprintf(stdout,"error unlocking mutex %d\n",ret);
@@ -92,6 +95,7 @@ void *track_efficiency(void *args)
     int ret;
     
     pthread_t tid;
+    //pthread_self() example
     tid = pthread_self();
     fprintf(stdout,"Track efficiency thread created %lu\n",tid);
     
@@ -100,11 +104,16 @@ void *track_efficiency(void *args)
      fprintf(stdout,"error in attributr init\n");
      pthread_exit(NULL);
     }
+    //getattr example
+    ret = pthread_getattr_np(tid,&attr);
+    if(ret!=0)
+    fprintf(stdout,"error getting default attributes\n");
 
     ret = pthread_attr_getstacksize(&attr,&stacksize);
     if(ret!=0)
     fprintf(stdout,"error getting stack size %d\n",ret);
     
+    //mutex_trylock example
     if(pthread_mutex_trylock(&stack_mutex)==0)
     {
       st_utlisation = (float)stacksize/stack_utilised;
@@ -112,7 +121,7 @@ void *track_efficiency(void *args)
       ret =  pthread_mutex_lock(&stack_cond_mutex);
       if(ret!=0)
       fprintf(stdout,"error locking mutex %d\n",ret);
-
+      //pthread_cond_signal example
       if(st_utlisation < 0.5)
       {
         pthread_cond_signal(&stack_condition);
@@ -154,6 +163,7 @@ void *action(void *args)
    ret = pthread_mutex_lock(&stack_cond_mutex);
    if(ret!=0)
     fprintf(stdout,"error locking mutex %d\n",ret);
+   //cond_wait example
    pthread_cond_wait(&stack_condition,&stack_cond_mutex);
    fprintf(stdout,"CPU is not overloaded\n");
    ret = pthread_mutex_unlock(&stack_cond_mutex);
@@ -178,12 +188,14 @@ int main()
       fprintf(stdout,"attribute initialisation error\n");
       return(err);
       }
+   //atrr_init example
    err = pthread_attr_init(&default_attr);
    if(err !=0)
      {
       fprintf(stdout,"default attribute initialisation error\n");
       return(err);
      }
+   //mutex_init example
    if(pthread_mutex_init(&stack_mutex,NULL) != 0)
      {
       fprintf(stdout,"mutex init failed\n");
@@ -194,6 +206,7 @@ int main()
       fprintf(stdout,"mutex init failed\n");
       return 1;
       }
+  //cond_init example
    if(pthread_cond_init(&stack_condition,NULL) != 0)
      {
       fprintf(stdout,"condition init failed\n");
@@ -204,6 +217,7 @@ int main()
       fprintf(stdout,"mutex init failed\n");
       return 1;
       }
+   //setattribute example
    err = pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
    if(err == 0)
       {
@@ -211,14 +225,16 @@ int main()
        errno = pthread_create( &thread1,&attr,cleanup,NULL);
        fprintf(stdout,"detached thread id is %d\n",errno);
       }  
+   //attr_destroy example
    err = pthread_attr_destroy(&attr);
    if(err!=0)
     fprintf(stdout,"error destroying the attribute %d\n",err);
-
+   //getattr_default example
    err = pthread_getattr_default_np(&default_attr);
    if(err!=0)
     fprintf(stdout,"error getting default attributes\n");
-
+   
+   //pthread_create example
    err = pthread_create(&thread1,&default_attr,track_process,NULL);
    if(err!=0)
     fprintf(stdout,"error creating thread %d\n",err);
@@ -231,7 +247,7 @@ int main()
    if(err!=0)
     fprintf(stdout,"error creating thread %d\n",err);
 
-
+   //pthread_join example
    err = pthread_join(thread1,NULL);
    if(err!=0)
     fprintf(stdout,"error joining threads %d\n",err);
@@ -264,7 +280,7 @@ int main()
    if(err!=0)
     fprintf(stdout,"error joining threads %d\n",err);
 
-
+   //mutex_destroy example
    err = pthread_mutex_destroy(&stack_mutex);
    if(err!=0)
     fprintf(stdout,"error destroying the stackmutex %d\n",err);
@@ -276,11 +292,13 @@ int main()
    err = pthread_mutex_destroy(&stack_cond_mutex);
    if(err!=0)
     fprintf(stdout,"error destroying the stackcondmutex %d\n",err);
-
+   
+   //cond_destroy example
    err = pthread_cond_destroy(&stack_condition);
    if(err!=0)
     fprintf(stdout,"error destroying the condition %d\n",err);
-
+   
+   //exit example
    pthread_exit(NULL);
 }
 
