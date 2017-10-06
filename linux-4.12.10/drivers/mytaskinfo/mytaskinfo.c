@@ -45,7 +45,7 @@ for(task = current;task!= &init_task;task=task->parent)
   {
   noofchildren++;
   }
-  printk(KERN_INFO "Process Name is %s PID is %d state is %lu has %d children\n",task->comm,task->pid,task->state,noofchildren);
+  printk(KERN_INFO "PROCESS NAME: %s PID: %d STATE: %lu has %d children\n",task->comm,task->pid,task->state,noofchildren);
 
 }
 rcu_read_unlock();
