@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "double_ll.h"
+
 /**************************************************************************************
 *@Filename:double_ll.c
 *
@@ -191,34 +192,3 @@ Status remove_node(struct node **head,void *data,uint16_t index)
         free(traverse);
         return Success;
 }
-
-/*int main()
-{
-struct node *head = NULL;
-uint8_t *removed_data1 = malloc(sizeof(uint8_t));
-remove_node(&head,removed_data1,1);
-uint32_t data1 = 20;
-add_node(&head,&data1,1);
-print(&head);
-uint32_t data2=30;
-add_node(&head,&data2,2);
-print(&head);
-uint32_t data3=40;
-add_node(&head,&data3,3);
-print(&head);
-uint32_t data4=50;
-add_node(&head,&data4,1);
-print(&head);
-uint32_t data5=60;
-add_node(&head,&data5,2);
-print(&head);
-uint32_t data=30;
-uint8_t* index;
-index=search(&head,&data);
-printf("found at %d\n",*index);
-uint8_t *removed_data = malloc(sizeof(uint8_t));
-remove_node(&head,removed_data,1);
-print(&head);
-destroy(&head);
-return 0;
-}*/
