@@ -51,6 +51,7 @@ Status add_node(struct node **head, void *item,uint16_t index)
 {
 	struct node *new_node = (struct node*) malloc(sizeof(struct node));
 	struct node *traverse = *head;
+        int i =1;
 	new_node->data =  malloc(sizeof(int));
 	*(int*)(new_node -> data) = *(int*)item;
 	new_node -> next = NULL;
@@ -70,7 +71,7 @@ Status add_node(struct node **head, void *item,uint16_t index)
 	}
 	else
 	{
-	for(int i=1;i<(index-1);i++)
+	for(i=1;i<(index-1);i++)
 	{
 	traverse = traverse->next;
 	}
