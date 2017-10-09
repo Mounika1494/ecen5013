@@ -8,16 +8,20 @@
 #include <sys/file.h>
 
 
-
+//mutex and condition
 pthread_mutex_t usr1_mutex;
 pthread_cond_t usr1_sig;
 pthread_mutex_t usr2_mutex;
 pthread_cond_t usr2_sig;
 
+//globals for state track
 static volatile int file_write_state = 1;
 static volatile int process_file_state = 1;
 static volatile int report_result_state = 1;
+static volatile int signal_int = 0;
+static volatile int signal_order = 0;
 
+//result
 struct result_struct 
 {
    int line_count;
@@ -46,28 +50,39 @@ void signal_handler(int signal)
 
   switch(signal) {
        case SIGUSR1:
+            signal_order = 1;
             file_write_state = 0;
+            process_file_state = 1;
             fprintf(stdout,"user signal 1 recieved\n");
             pthread_cond_signal(&usr1_sig);
             break;
        case SIGUSR2:
-            process_file_state = 0;
-            fprintf(stdout,"user signal 2 recieved\n");
-            pthread_cond_signal(&usr2_sig);
+            
+           if(signal_order == 0)
+            {
+              fprintf(stdout,"\nShould Kill SIGUSR1 before SIGUSR2\n");
+              break;
+            }
+            else if(signal_order == 1)
+            {
+              process_file_state = 0;
+              fprintf(stdout,"user signal 2 recieved\n");
+              pthread_cond_signal(&usr2_sig);
+              break;
+            }
             break;
+       
        case SIGTERM:
+            signal_int = 1;
             file_write_state = 0;
-            process_file_state =0;
             pthread_cond_signal(&usr1_sig);
-            report_result_state = 0;
-            pthread_cond_signal(&usr2_sig);
+            break;
        
        case SIGINT:
+            signal_int = 1;
             file_write_state = 0;
-            process_file_state =0;
             pthread_cond_signal(&usr1_sig);
-            report_result_state = 0;
-            pthread_cond_signal(&usr2_sig);
+            break;
 
        default:
             fprintf(stdout,"unknown signal caught\n");
@@ -83,34 +98,39 @@ void *process_file(void *args)
    struct result_struct *result = (struct result_struct *)args;
    char data;
    FILE *input_file;
+   
    result->line_count = 0;
    result->word_count = 0;
    result->char_count = 0;
-   
-   while(file_write_state == 0)
+   while(process_file_state == 1)
    {
-     
-     while(process_file_state == 1)
-     {
+       pthread_cond_wait(&usr1_sig,&usr1_mutex);
+       while(file_write_state == 0)
+       {
+
        input_file = fopen((result->filename),"r");
        if(input_file == NULL)
        return 0;
-       pthread_cond_wait(&usr1_sig,&usr1_mutex);
+
        while((data=fgetc(input_file))!=EOF)
        {
-       if(data != ' '&& data != '\n')
-       result->char_count++;
-       if(data == ' ' || data == '\n')
-       result->word_count++;
-       if(data == '\n')
-       result->line_count++;
+         putchar(data);
+         if(data != ' '&& data != '\n')
+          result->char_count++;
+         if(data == ' ' || data == '\n')
+          result->word_count++;
+         if(data == '\n')
+          result->line_count++;
        }
-       fprintf(stdout,"Lines:%d\n",result->line_count);
-       fprintf(stdout,"Words:%d\n",result->word_count);
-       fprintf(stdout,"characters:%d\n",result->char_count);
+       process_file_state = 0;
        fclose(input_file);
        break;
-     }
+       }
+   }
+   if(signal_int == 1)
+   {
+    report_result_state = 0;
+    pthread_cond_signal(&usr2_sig);
    }
   return NULL;
 }
@@ -121,16 +141,17 @@ void *report_result(void *args)
 {
 
    struct result_struct *result = (struct result_struct *)args;
-   while(process_file_state == 0)
-   {
    while(report_result_state == 1)
    {
    pthread_cond_wait(&usr2_sig,&usr2_mutex);
-   fprintf(stdout,"***reporting******\n");
-   fprintf(stdout,"Lines:%d\n",result->line_count);
-   fprintf(stdout,"Words:%d\n",result->word_count);
-   fprintf(stdout,"characters:%d\n",result->char_count);
-   break;
+   while(process_file_state == 0)
+   {
+     fprintf(stdout,"***reporting******\n");
+     fprintf(stdout,"Lines:%d\n",result->line_count);
+     fprintf(stdout,"Words:%d\n",result->word_count);
+     fprintf(stdout,"characters:%d\n",result->char_count);
+     report_result_state = 0;
+     break;
    }
    }
    return NULL;
@@ -214,10 +235,10 @@ int main()
    }
    
    
-   
+   fprintf(stdout,"Enter the data for the file\n");
+   fclose(fopen(filename,"w"));
    while(file_write_state == 1)
-   {
-      fprintf(stdout,"Enter the data for the file");  
+   {  
       input_file = fopen(filename,"a");
       if(input_file == NULL)
       {
@@ -256,6 +277,4 @@ int main()
    err = pthread_cond_destroy(&usr2_sig);
    if(err!=0)
     fprintf(stdout,"error destroying the stackmutex %d\n",err);
-
-
 }
